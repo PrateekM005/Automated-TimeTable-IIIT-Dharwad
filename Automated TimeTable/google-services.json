@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "22050435535",
+    "project_id": "automated-timetable-iiitdwd",
+    "storage_bucket": "automated-timetable-iiitdwd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:22050435535:android:9f5846cc1d2b424d18e2ba",
+        "android_client_info": {
+          "package_name": "com.prateek.AutomatedTimetable"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClI5smx5YpIzzREjmCwjisVgKUl9pWRgI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
