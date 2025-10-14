@@ -40,13 +40,14 @@ This project is an automated scheduling system for IIIT Dharwad that:
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-* Frontend: React + TailwindCSS
-* Backend: Node.js / Express
-* Database: PostgreSQL
-* Algorithms: Constraint Satisfaction / Local Search
-* Deployment: Docker
+* **Frontend:** Streamlit
+* **Backend & Core Logic:** Python
+* **Optimization Engine:** Google OR-Tools (CP-SAT Solver)
+* **Data Handling:** Pandas
+* **Input/Output Format:** CSV & Excel (.xlsx)
+
 
 ---
 
