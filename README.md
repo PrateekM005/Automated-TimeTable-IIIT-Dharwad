@@ -184,7 +184,7 @@ This project is an automated scheduling system for IIIT Dharwad that:
 
 ## Architecture & Flow
 
-1. **Input Layer** — JSON/CSV upload + manual forms.
+1. **Input Layer** — CSV upload + manual forms.
 2. **Preprocessor** — Validates inputs, expands LTPSC.
 3. **Constraint Engine** — Hard & soft constraints.
 4. **Scheduler** — Greedy + local search / repair algorithm.
@@ -247,7 +247,69 @@ curl -X POST http://localhost:5000/api/generate \
 
 * Unit tests for constraints.
 * Integration tests: small vs large dataset.
-* Validate: no overlaps, capacity respected, ≤1 lecture/day.
+* Validate: no overlaps, capacity respected, ≤1 lecture/day , etc.
+
+### Test Plan — Unit Level (Without Streamlit UI)
+
+This section outlines the **unit-level test cases** for backend functions.  
+Each test case includes input data, description, and expected output for validation.
+
+---
+
+### Utility Function Test Cases
+
+| Test case input | Description | Expected output |
+|------------------|-------------|-----------------|
+| `minutes_to_time(540)` | Convert 540 minutes into HH:MM format | `"09:00"` |
+| `minutes_to_time(615)` | Convert 615 minutes (10:15 AM) into HH:MM | `"10:15"` |
+| `generate_color_from_string("CS101")` | Generate deterministic color based on input string | Returns tuple of two valid `hsl()` color strings; consistent for same input |
+| `decompose_sessions([{'code':'CS101','L':2,'T':1,'P':0,'year':1,'instructor':'A'}])` | Decompose course dictionary into individual sessions | Returns 3 sessions: 2 lectures (90 min each), 1 tutorial (60 min) |
+
+---
+
+### Core Solver Function – `generate_timetable_fast()`
+
+| Test case input | Description | Expected output |
+|------------------|-------------|-----------------|
+| Courses: `[{'code':'C1','L':1,'T':0,'P':0,'students':20,'year':1,'instructor':'ProfA'}]`, Rooms: `[{'name':'R1','capacity':30}]` | Single course, single room, small class | One session scheduled in “R1”; feasible timetable |
+| Two courses with same instructor (`ProfA`) | Test instructor conflict avoidance | Sessions do not overlap on same day |
+| One course with 100 students, Room with capacity 30 | Room too small for class | Returns `None` (no feasible timetable) |
+| One course with 2 lectures (`L=2`) | Validate lunch-time exclusion logic | No class starts or ends within 13:00–14:00 (780–840 minutes) |
+| Two courses: one elective (`True`), one regular (`False`) | Validate elective scheduling flexibility | Both scheduled successfully; elective allowed on flexible slots |
+| One course with 3 lectures (`L=3`) | Same course, multiple lectures separation | Lectures spread across different days |
+| 15 lab courses, each 2 hours, only one room | Heavy infeasible case | Returns `None` (solver fails gracefully) |
+| Two courses in different years (1 and 2) | Year-based separation validation | Overlaps allowed between different years |
+
+---
+
+### HTML Table Generator – `generate_html_timetable()`
+
+| Test case input | Description | Expected output |
+|------------------|-------------|-----------------|
+| `[]` (empty assignment list) | No sessions scheduled | Returns valid HTML `<table>` with empty cells and “Lunch” row |
+| One assignment: `{'course':'C1','activity':'L','instructor':'ProfA','day':'Mon','start_min':540,'end_min':630,'room':'R1','year':1}` | Single class to render | HTML contains “C1(L)”, “R1”, “ProfA” with proper color styling |
+| Multiple assignments across Mon–Fri | Check table ordering | Days appear in Mon–Fri order with lunch block correctly placed |
+
+---
+
+### Excel Grid Generator – `build_grid_for_download()`
+
+| Test case input | Description | Expected output |
+|------------------|-------------|-----------------|
+| `[]` (no assignments) | Empty timetable grid | DataFrame filled with “-” for all cells |
+| One assignment: Mon 9:00–10:30 | Single class slot | Grid cell at “Mon, 09:00” = `"C1(L)/R1/ProfA"`, filled until 10:30 |
+| Multiple sessions on different days | Day-wise filling test | Each day correctly filled; no overlaps |
+
+---
+
+### Boundary Condition Tests
+
+| Test case input | Description | Expected output |
+|------------------|-------------|-----------------|
+| Course with duration 0 | Invalid duration edge case | No session created or solver returns failure |
+| Room list empty (`[]`) | Missing room resources | Returns `None` (no feasible timetable) |
+| Courses list empty (`[]`) | No courses to schedule | Returns empty list `[]` |
+| One long lab (4 hours) overlapping lunch | Check lunch-time restriction | Scheduled before or after lunch (not across it) |
 
 ---
 
@@ -288,11 +350,14 @@ MIT License. Team members: *Add team names here*. Include external library licen
 
 * OR-tools / Constraint Solver libraries
 * IIIT Dharwad for project guidelines
-* Open-source React, Node.js, TailwindCSS docs
+* Open-source Google OR, pandas docs, 
 
 ---
 
 ## Contact
 
-**Team Lead:** Prateek Mitra — [email@example.com](mailto:email@example.com)
+**Team Member:** Prateek 
+**Team Member:** Omkar
+**Team Member:** Parth 
+**Team Member:** Praveen 
 **Repo:** `https://github.com/<your-org>/automated-timetable-iiit-dharwad`
